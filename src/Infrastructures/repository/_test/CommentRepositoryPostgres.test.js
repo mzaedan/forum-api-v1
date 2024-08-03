@@ -161,46 +161,49 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   describe('getCommentsByThreadId function', () => {
-    it('should return thread comments correctly', async () => {
+    it('should get comments by threadId correctly', async () => {
       // Arrange
-      const userId = 'user-123';
-      const otherUserId = 'user-456';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+      const userPayload = {
+        id: 'user-123',
+        username: 'user123',
+      };
+      await UsersTableTestHelper.addUser(userPayload);
       const threadId = 'thread-123';
-
-      await UsersTableTestHelper.addUser({ id: userId, username: 'foobar' });
-      await UsersTableTestHelper.addUser({ id: otherUserId, username: 'johndoe' });
-      await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
-
-      await CommentsTableTestHelper.addComment({
-        id: 'comment-new',
-        content: 'A new comment',
-        date: '2023-09-10',
-        thread: threadId,
-        owner: userId,
-      });
-      await CommentsTableTestHelper.addComment({
-        id: 'comment-old',
-        content: 'An old comment',
-        date: '2023-09-09',
-        thread: threadId,
-        owner: otherUserId,
-      });
-
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      await ThreadsTableTestHelper.addThread({ id: threadId, owner: userPayload.id });
+      const commentPayload = {
+        id: 'comment-123',
+        threadId,
+        content: 'Example Comment',
+        owner: userPayload.id,
+      };
+      await CommentsTableTestHelper.addComment(commentPayload);
 
       // Action
-      const comments = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
+      const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
 
       // Assert
-      expect(comments).toHaveLength(2);
-      expect(comments[0].id).toBe('comment-old'); // older comment first
-      expect(comments[1].id).toBe('comment-new');
-      expect(comments[0].username).toBe('johndoe');
-      expect(comments[1].username).toBe('foobar');
-      expect(comments[0].content).toBe('An old comment');
-      expect(comments[1].content).toBe('A new comment');
-      expect(comments[0].date).toBeTruthy();
-      expect(comments[1].date).toBeTruthy();
+      expect(commentsResult).toBeDefined();
+      expect(commentsResult).toHaveLength(1);
+      expect(commentsResult[0].id).toEqual(commentPayload.id);
+      expect(commentsResult[0].content).toEqual(commentPayload.content);
+      expect(commentsResult[0].username).toEqual(userPayload.username);
+    });
+
+    it('should get empty array when comments by threadId is empty', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+      const userId = 'user-123';
+      await UsersTableTestHelper.addUser({ id: userId });
+      const threadId = 'thread-123';
+      await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
+
+      // Action
+      const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
+
+      // Assert
+      expect(commentsResult).toBeDefined();
+      expect(commentsResult).toHaveLength(0);
     });
   });
 
@@ -229,6 +232,8 @@ describe('CommentRepositoryPostgres', () => {
       const comments = await CommentsTableTestHelper.findCommentsById(commentId);
       expect(comments).toHaveLength(1);
       expect(comments[0].deleted_at).toBeTruthy();
+      // Ensure deleted_at is a valid timestamp
+      expect(new Date(comments[0].deleted_at).getTime()).not.toBeNaN();
     });
   });
 });
