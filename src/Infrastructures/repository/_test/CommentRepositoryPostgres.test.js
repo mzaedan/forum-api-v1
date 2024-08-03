@@ -128,13 +128,13 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should persist new comment', async () => {
       // Arrange
-      const newComment = new NewComment({ content: 'A comment' });
+      const newComment = new NewComment({ threadId: 'thread-123', content: 'A comment', owner: 'user-123' });
 
       const fakeIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
 
       // Action
-      await commentRepositoryPostgres.addComment('user-123', 'thread-123', newComment);
+      await commentRepositoryPostgres.addComment(newComment);
 
       // Assert
       const comments = await CommentsTableTestHelper.findCommentsById('comment-123');
@@ -143,13 +143,13 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should return added comment correctly', async () => {
       // Arrange
-      const newComment = new NewComment({ content: 'A comment' });
+      const newComment = new NewComment({ threadId: 'thread-123', content: 'A comment', owner: 'user-123' });
 
       const fakeIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
 
       // Action
-      const addedComment = await commentRepositoryPostgres.addComment('user-123', 'thread-123', newComment);
+      const addedComment = await commentRepositoryPostgres.addComment(newComment);
 
       // Assert
       expect(addedComment).toStrictEqual(new AddedComment({
