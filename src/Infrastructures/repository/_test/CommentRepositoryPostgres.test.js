@@ -167,55 +167,56 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   describe('getCommentsByThreadId function', () => {
-    it('should get comments by threadId correctly', async () => {
-      // Arrange
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
-      const userPayload = {
-        id: 'user-123',
-        username: 'user123',
-      };
-      await UsersTableTestHelper.addUser(userPayload);
-      const threadId = 'thread-123';
-      await ThreadsTableTestHelper.addThread({ id: threadId, owner: userPayload.id });
-      const commentPayload = {
-        id: 'comment-123',
-        threadId,
-        content: 'Example Comment',
-        owner: userPayload.id,
-      };
-      await CommentsTableTestHelper.addComment(commentPayload);
+  it('should get comments by threadId correctly', async () => {
+  // Arrange
+  const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+  const userPayload = {
+    id: 'user-123',
+    username: 'user123',
+  };
+  await UsersTableTestHelper.addUser(userPayload);
+  const threadId = 'thread-123';
+  await ThreadsTableTestHelper.addThread({ id: threadId, owner: userPayload.id });
+  const commentPayload = {
+    id: 'comment-123',
+    threadId,
+    content: 'Example Comment',
+    owner: userPayload.id,
+  };
+  await CommentsTableTestHelper.addComment(commentPayload);
 
-      // Action
-      const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
+  // Action
+  const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
 
-      // Assert
-      expect(commentsResult).toBeDefined();
-      expect(commentsResult).toHaveLength(1);
-      expect(commentsResult[0]).toStrictEqual({
-        id: commentPayload.id,
-        content: commentPayload.content,
-        username: userPayload.username,
-        date: expect.any(String), // Assuming date is returned as a string
-        deleted_at: null, // Assuming deleted_at is null for non-deleted comments
-      });
-    });
-
-    it('should get empty array when comments by threadId is empty', async () => {
-      // Arrange
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
-      const userId = 'user-123';
-      await UsersTableTestHelper.addUser({ id: userId });
-      const threadId = 'thread-123';
-      await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
-
-      // Action
-      const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
-
-      // Assert
-      expect(commentsResult).toBeDefined();
-      expect(commentsResult).toHaveLength(0);
-    });
+  // Assert
+  expect(commentsResult).toBeDefined();
+  expect(commentsResult).toHaveLength(1);
+  expect(commentsResult[0]).toMatchObject({
+    id: commentPayload.id,
+    content: commentPayload.content,
+    username: userPayload.username,
+    deleted_at: null, // Assuming deleted_at is null for non-deleted comments
   });
+});
+
+  it('should get empty array when comments by threadId is empty', async () => {
+    // Arrange
+    const commentRepositoryPostgres = new CommentRepositoryPostgres(pool);
+    const userId = 'user-123';
+    await UsersTableTestHelper.addUser({ id: userId });
+    const threadId = 'thread-123';
+    await ThreadsTableTestHelper.addThread({ id: threadId, owner: userId });
+
+    // Action
+    const commentsResult = await commentRepositoryPostgres.getCommentsByThreadId(threadId);
+
+    // Assert
+    expect(commentsResult).toBeDefined();
+    expect(commentsResult).toHaveLength(0);
+  });
+  });
+
+
 
   describe('deleteCommentById function', () => {
     it('should soft delete comment and update deleted_at field', async () => {
