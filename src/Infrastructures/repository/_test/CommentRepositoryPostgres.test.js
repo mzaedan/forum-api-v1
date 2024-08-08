@@ -139,6 +139,12 @@ describe('CommentRepositoryPostgres', () => {
       // Assert
       const comments = await CommentsTableTestHelper.findCommentsById('comment-123');
       expect(comments).toHaveLength(1);
+      const comment = comments[0];
+      expect(comment.id).toBe('comment-123');
+      expect(comment.content).toBe('A comment');
+      expect(comment.owner).toBe('user-123');
+      expect(comment.thread).toBe('thread-123');
+      expect(comment.deleted_at).toBeNull();
     });
 
     it('should return added comment correctly', async () => {
@@ -185,9 +191,13 @@ describe('CommentRepositoryPostgres', () => {
       // Assert
       expect(commentsResult).toBeDefined();
       expect(commentsResult).toHaveLength(1);
-      expect(commentsResult[0].id).toEqual(commentPayload.id);
-      expect(commentsResult[0].content).toEqual(commentPayload.content);
-      expect(commentsResult[0].username).toEqual(userPayload.username);
+      expect(commentsResult[0]).toStrictEqual({
+        id: commentPayload.id,
+        content: commentPayload.content,
+        username: userPayload.username,
+        date: expect.any(String), // Assuming date is returned as a string
+        deleted_at: null, // Assuming deleted_at is null for non-deleted comments
+      });
     });
 
     it('should get empty array when comments by threadId is empty', async () => {
@@ -231,9 +241,10 @@ describe('CommentRepositoryPostgres', () => {
       // Assert
       const comments = await CommentsTableTestHelper.findCommentsById(commentId);
       expect(comments).toHaveLength(1);
-      expect(comments[0].deleted_at).toBeTruthy();
+      const comment = comments[0];
+      expect(comment.deleted_at).toBeTruthy();
       // Ensure deleted_at is a valid timestamp
-      expect(new Date(comments[0].deleted_at).getTime()).not.toBeNaN();
+      expect(new Date(comment.deleted_at).getTime()).not.toBeNaN();
     });
   });
 });
