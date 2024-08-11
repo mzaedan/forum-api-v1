@@ -7,7 +7,7 @@ class CommentDetail {
     this.content = payload.content;
     this.date = payload.date;
     this.replies = payload.replies;
-    this.deleted_at = payload.deleted_at;  // Menambahkan properti deleted_at
+    this.deleted_at = payload.deleted_at;
   }
 
   _verifyPayload(payload) {
@@ -17,7 +17,7 @@ class CommentDetail {
       content,
       date,
       replies,
-      deleted_at,  // Memeriksa keberadaan deleted_at
+      deleted_at,
     } = payload;
 
     if (!id || !username || !content || !date) {
@@ -30,7 +30,7 @@ class CommentDetail {
       || typeof content !== 'string'
       || (typeof date !== 'string' && typeof date !== 'object')
       || !Array.isArray(replies)
-      || (deleted_at !== null && deleted_at !== undefined && typeof deleted_at !== 'string')  // Memeriksa tipe data deleted_at jika ada
+      || (deleted_at !== null && deleted_at !== undefined && typeof deleted_at !== 'string')
     ) {
       throw new Error('COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }

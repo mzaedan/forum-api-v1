@@ -28,6 +28,21 @@ describe('ThreadDetail entities', () => {
     expect(() => new ThreadDetail(payload)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
+  it('should throw error when id is not a string', () => {
+    // Arrange
+    const payload = {
+      id: 123, // id as a number instead of string
+      title: 'A thread',
+      body: 'A long thread',
+      date: '2023-09-22T07:19:09.775Z',
+      username: 'dicoding',
+      comments: [],
+    };
+
+    // Action & Assert
+    expect(() => new ThreadDetail(payload)).toThrowError('THREAD_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+  });
+
   it('should create ThreadDetail entities correctly', () => {
     // Arrange
     const payload = {

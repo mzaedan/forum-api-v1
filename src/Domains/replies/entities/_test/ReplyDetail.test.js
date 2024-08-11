@@ -25,6 +25,19 @@ describe('ReplyDetail entities', () => {
     expect(() => new ReplyDetail(payload)).toThrowError('REPLY_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
+  it('should throw error when id is not a string', () => {
+    // Arrange
+    const payload = {
+      id: 123, // id as a number instead of string
+      username: 'foobar',
+      content: 'a reply',
+      date: '2023-09-22T07:19:09.775Z',
+    };
+
+    // Action & Assert
+    expect(() => new ReplyDetail(payload)).toThrowError('REPLY_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION');
+  });
+
   it('should create ReplyDetail entities correctly', () => {
     // Arrange
     const payload = {
@@ -43,5 +56,6 @@ describe('ReplyDetail entities', () => {
     expect(replyDetail.username).toEqual(payload.username);
     expect(replyDetail.content).toEqual(payload.content);
     expect(replyDetail.date).toEqual(payload.date);
+    expect(replyDetail.deleted_at).toEqual(payload.deleted_at);
   });
 });
