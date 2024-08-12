@@ -24,6 +24,14 @@ describe('GetThreadDetailUseCase', () => {
       username: 'johndoe',
       date: '2023-09-08T07:22:33.555Z',
       content: 'a comment',
+      deleted_at: null, // Ubah dari undefined ke null
+    };
+ 
+    const mockReplyData = { // Pastikan mockReplyData didefinisikan
+      id: 'reply-123',
+      username: 'johndoe',
+      date: '2023-09-08T07:22:33.555Z',
+      content: 'a reply',
     };
  
     const mockThreadRepository = new ThreadRepository();
@@ -75,6 +83,7 @@ describe('GetThreadDetailUseCase', () => {
       username: 'johndoe',
       date: '2023-09-08T07:22:33.555Z',
       content: 'a comment',
+      deleted_at: null, // Sesuaikan dengan null
     };
 
     const mockReplyData = {
@@ -82,6 +91,7 @@ describe('GetThreadDetailUseCase', () => {
       username: 'johndoe',
       date: '2023-09-08T07:22:33.555Z',
       content: 'a reply',
+      deleted_at: null, // Sesuaikan dengan null
     };
 
     const mockDeletedCommentData = {
@@ -149,3 +159,4 @@ describe('GetThreadDetailUseCase', () => {
     expect(mockReplyRepository.getRepliesByCommentId).toHaveBeenCalledWith(mockDeletedCommentData.id);
   });
 });
+
